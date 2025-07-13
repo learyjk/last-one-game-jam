@@ -16,7 +16,7 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_th87o"]
 size = Vector2(24, 24)
 
-[node name="Segment" type="Node2D"]
+[node name="Segment" type="Area2D"]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.2, 0.2)

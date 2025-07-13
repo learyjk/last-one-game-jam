@@ -2,7 +2,7 @@ extends Node2D
 
 const GRID_SIZE = 32
 const STEP_TIME = 0.15
-const DEFAULT_LENGTH = 10
+const DEFAULT_LENGTH = 20
 
 @onready var head := $Head
 @onready var segment_container := $SegmentContainer
@@ -47,6 +47,9 @@ func move_step():
 	head_grid_position += Vector2i(direction)
 	var new_position = Vector2(head_grid_position) * GRID_SIZE
 	
+	# Check for collision with own segments
+	var collision_index = check_self_collision(new_position)
+	
 	# Update head position
 	head.position = new_position
 	
@@ -57,7 +60,11 @@ func move_step():
 	print("Head grid position: ", head_grid_position)
 	print("New position: ", new_position)
 	
-	# Spawn segments one at a time
+	# Handle collision - chop off tail after collision point
+	if collision_index != -1:
+		chop_tail_at_collision(collision_index)
+	
+	# Spawn segments one at a time (only if we haven't hit max length)
 	if steps_taken < DEFAULT_LENGTH:
 		var seg = segment_scene.instantiate()
 		segment_container.add_child(seg)
@@ -75,3 +82,36 @@ func move_step():
 		position_history.resize(segments.size() + 5)
 	
 	steps_taken += 1
+
+func check_self_collision(head_pos: Vector2) -> int:
+	# Check if head position matches any segment position
+	# Skip the first position in history since that's where the head was
+	for i in range(1, position_history.size()):
+		if position_history[i] == head_pos:
+			print("Collision detected at position: ", head_pos, " with segment at history index: ", i)
+			return i
+	return -1
+
+func chop_tail_at_collision(collision_index: int):
+	print("Chopping tail at collision index: ", collision_index)
+	
+	# Calculate how many segments to remove
+	# collision_index is the position in history where collision occurred
+	# We want to keep segments up to (but not including) the collision point
+	var segments_to_keep = collision_index - 1
+	
+	# Make sure we don't go negative
+	segments_to_keep = max(0, segments_to_keep)
+	
+	# Remove excess segments from the scene
+	var segments_to_remove = segments.size() - segments_to_keep
+	for i in range(segments_to_remove):
+		if segments.size() > 0:
+			var segment_to_remove = segments.pop_back()
+			segment_to_remove.queue_free()
+	
+	# Trim position history to match
+	if position_history.size() > segments_to_keep + 1:  # +1 for head position
+		position_history.resize(segments_to_keep + 1)
+	
+	print("Snake length after chopping: ", segments.size())
