@@ -1,7 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://c7tv7ykc2kvrc"]
+[gd_scene load_steps=3 format=3 uid="uid://c7tv7ykc2kvrc"]
 
+[ext_resource type="Script" uid="uid://bldkyeyd3vlmm" path="res://scenes/main.gd" id="1_1kc1q"]
 [ext_resource type="PackedScene" uid="uid://ck2rqgrhvd7vr" path="res://scenes/snake.tscn" id="1_s6dok"]
 
-[node name="Node2D" type="Node2D"]
+[node name="Main" type="Node2D"]
+script = ExtResource("1_1kc1q")
 
 [node name="Snake" parent="." instance=ExtResource("1_s6dok")]
+
+[node name="Snake2" parent="." instance=ExtResource("1_s6dok")]
